@@ -1,12 +1,18 @@
 import axios from 'axios';
 import React from 'react';
 
-export default function LoginPage() {
+export default function LoginPage({ user }) {
+  console.log(user);
   const submitHandler = async (e) => {
     e.preventDefault();
     const res = await axios.post('/auth/login', Object.fromEntries(new FormData(e.target)));
     if (res.status === 200) {
-      window.location = '/';
+      // Предполагается, что сервер возвращает информацию о том, является ли пользователь администратором
+      if (user.admin === true) {
+        window.location = '/api/pars'; // Перенаправление для администратора
+      } else {
+        window.location = '/table'; // Перенаправление для обычного пользователя
+      }
     }
   };
   return (
