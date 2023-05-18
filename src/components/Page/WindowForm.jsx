@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function OnePost() {
+export default function OnePost({ post, photos }) {
   return (
     <div
       className="card text"
