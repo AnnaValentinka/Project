@@ -2,13 +2,6 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
 export default function TablForm() {
-  const [allEntries, setAllEntries] = useState(foxes);
-  const [input, setInput] = useState('');
-
-  useEffect(() => {
-    axios.post('./entries/search', { input }).then(({ data }) => setAllEntries(data));
-  }, [input])
-
 
 
   return (
@@ -34,43 +27,38 @@ export default function TablForm() {
             <th scope="col">УЗ</th>
             <th scope="col">Адрес</th>
             <th scope="col">Описание места размещения РИМ</th>
-            <th scope="col">Фото 1</th>
-            <th scope="col">Фото 2</th>
-            <th scope="col">Ссылка на страницу</th>
+            <th scope="col" style={{ width: 150 }}>
+              Фото
+            </th>
+            <th scope="col">Подробнее</th>
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <th scope="row">1</th>
-            <td>Санкт-Петербург</td>
-            <td>
-              Санкт-Петербургский государственный университет телекоммуникаций им. проф.
-              М.А.Бонч-Бруевича
-            </td>
-            <td>Дальневосточный пр., д. 71</td>
-            <td>Общежитие Дальневосточное, входная зона</td>
-            <td>ссылка на фото-1</td>
-            <td>
-              <button type="button" className="btn btn-info">
-                Добавить
-              </button>
-            </td>
-            <a href="/window">
-              {' '}
-              <td>ссылка на страницу</td>
-            </a>
-          </tr>
-          <tr>
-            <th scope="row">2</th>
-            <td>Jacob</td>
-            <td>Thornton</td>
-            <td>@fat</td>
-          </tr>
-          <tr>
-            <th scope="row">3</th>
-            <td colSpan="2">Larry the Bird</td>
-            <td>@twitter</td>
-          </tr>
+          {posts.map((post, index) => (
+            <tr key={post.id}>
+              <th scope="row">{index + 1}</th>
+              <td>{post.city}</td>
+              <td>{post.name}</td>
+              <td>{post.address}</td>
+              <td>{post.advertising}</td>
+              <td>
+                {photos
+                  .filter((photo) => photo.education_id === post.id)
+                  .map((photo, photoIndex) => (
+                    <div key={photo.id}>
+                      <a href={photo.urlPhoto} target="_blank" rel="noopener noreferrer">
+                        Фото {photoIndex + 1}
+                      </a>
+                    </div>
+                  ))}
+              </td>
+              <td>
+                <a href={`/window/${post.uuID}`} className="btn btn-info">
+                  Посмотреть подробнее
+                </a>
+              </td>
+            </tr>
+          ))}
         </tbody>
       </table>
     </>

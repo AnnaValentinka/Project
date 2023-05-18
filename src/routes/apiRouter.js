@@ -45,15 +45,18 @@ router.post('/upload', isAdmin, upload.single('file'), async (req, res) => {
         advertising: data['Описание места размещения РИМ'],
         uuID: uuidv4(),
       });
+      const educationId = education.id; // Получаем ID созданного поста
 
-      // Создание записи фото, связанной с  адрессом
-      // await Photo.create({
-      //   education_id: data[],
-      //   urlPhoto: data[],
-
-      // });
+      const photoFields = Object.keys(data).filter((key) => key.startsWith('Фото'));
+      for (const field of photoFields) {
+        if (data[field]) {
+          await Photo.create({
+            education_id: educationId,
+            urlPhoto: data[field],
+          });
+        }
+      }
     }
-    res.sendStatus(200);
     // res.json({ message: 'File uploaded and data saved successfully' });
   } catch (error) {
     console.log('Error uploading file:', error);
