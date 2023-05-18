@@ -6,7 +6,7 @@ export default function SignUpPage() {
     e.preventDefault();
     const res = await axios.post('/auth/signup', Object.fromEntries(new FormData(e.target)));
     if (res.status === 200) {
-      window.location = '/';
+      window.location = '/table';
     }
   };
 
