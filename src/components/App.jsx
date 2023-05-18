@@ -9,16 +9,18 @@ import TablForm from './Page/TablForm';
 import ParsForm from './Page/ParsForm';
 import WindowForm from './Page/WindowForm';
 
-export default function App({ user }) {
+export default function App({ user, posts, photos, post }) {
+  // console.log(posts);
+
   return (
     <div className="container">
       <NavBar />
       <Routes>
         <Route path="/" element={<Main />} />
         <Route path="/authform" element={<AuthForm />} />
-        <Route path="/table" element={<TablForm />} />
+        <Route path="/table" element={<TablForm posts={posts} photos={photos} user={user} />} />
         <Route path="/api/pars" element={<ParsForm user={user} />} />
-        <Route path="/window" element={<WindowForm />} />
+        <Route path="/window/:id" element={<WindowForm post={post} photos={photos} />} />
 
         <Route path="/auth/login" element={<LoginPage user={user} />} />
         <Route path="/auth/signup" element={<SignUpPage />} />
