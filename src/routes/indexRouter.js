@@ -25,6 +25,30 @@ router.get('/window/:id', async (req, res) => {
       photos: postPhotos,
     };
 
+    res.set('Access-Control-Allow-Origin', '*'); // Устанавливаем заголовок CORS
+
+    res.render('Layout', initState);
+  } catch (error) {
+    console.log('Error fetching post and photos:', error);
+    res.status(500).json({ message: 'Error fetching post and photos' });
+  }
+});
+
+router.get('/window/:id', async (req, res) => {
+  try {
+    const uuID = req.params.id;
+    const post = await Education.findOne({ where: { uuID } });
+    const postPhotos = await Photo.findAll({
+      where: {
+        education_id: post.id,
+      },
+    });
+
+    const initState = {
+      post,
+      photo: postPhotos,
+    };
+    console.log(photo);
     res.render('Layout', initState);
   } catch (error) {
     console.log('Error fetching post and photos:', error);

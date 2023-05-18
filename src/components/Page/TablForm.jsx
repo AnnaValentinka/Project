@@ -1,7 +1,7 @@
 import React from 'react';
 
 export default function TablForm({ posts, photos }) {
-  console.log(posts);
+  // console.log(posts);
 
   const handleDetailsClick = (uuid) => {
     // Обработчик для кнопки "Посмотреть подробнее"
