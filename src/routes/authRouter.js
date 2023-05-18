@@ -32,13 +32,13 @@ authRouter.post('/login', async (req, res) => {
 
   if (!(email && password)) res.sendStatus(400);
 
-  const foundUser = await User.findOne({ where: { email } });
+  const user = await User.findOne({ where: { email } });
 
-  if (!foundUser) res.sendStatus(400);
+  if (!user) res.sendStatus(400);
 
-  if (!(await bcrypt.compare(password, foundUser.password))) res.sendStatus(401);
+  if (!(await bcrypt.compare(password, user.password))) res.sendStatus(401);
 
-  req.session.user = foundUser;
+  req.session.user = user;
   res.sendStatus(200);
 });
 

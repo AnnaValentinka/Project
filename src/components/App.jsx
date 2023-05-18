@@ -10,7 +10,7 @@ import ParsForm from './Page/ParsForm';
 import WindowForm from './Page/WindowForm';
 
 export default function App({ user, posts, photos, post }) {
-  // console.log(posts);
+  console.log(user);
 
   return (
     <div className="container">
