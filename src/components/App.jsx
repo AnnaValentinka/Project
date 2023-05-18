@@ -6,6 +6,7 @@ import Main from './Main';
 import NavBar from './ui/NavBar';
 import AuthForm from './Page/AuthForm';
 
+
 export default function App() {
   return (
     <div className="container">
