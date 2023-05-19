@@ -9,7 +9,7 @@ import TablForm from './Page/TablForm';
 import ParsForm from './Page/ParsForm';
 import WindowForm from './Page/WindowForm';
 
-export default function App({ user }) {
+export default function App({ user, educations }) {
   return (
     <div className="container">
       <NavBar />
@@ -17,7 +17,7 @@ export default function App({ user }) {
         <Route path="/" element={<Main />} />
         <Route path="/authform" element={<AuthForm />} />
         <Route path="/table" element={<TablForm />} />
-        <Route path="/api/pars" element={<ParsForm user={user} />} />
+        <Route path="/api/pars" element={<ParsForm user={user} educations={educations} />} />
         <Route path="/window" element={<WindowForm />} />
 
         <Route path="/auth/login" element={<LoginPage user={user} />} />

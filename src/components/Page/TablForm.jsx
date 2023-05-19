@@ -1,6 +1,8 @@
 import React from 'react';
+import OneTabl from './OneTabl';
 
-export default function TablForm() {
+export default function TablForm({ user, educations }) {
+  const []
   return (
     <>
       <form className="d-flex" role="search" style={{ marginTop: 20 }}>
@@ -28,37 +30,9 @@ export default function TablForm() {
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <th scope="row">1</th>
-            <td>Санкт-Петербург</td>
-            <td>
-              Санкт-Петербургский государственный университет телекоммуникаций им. проф.
-              М.А.Бонч-Бруевича
-            </td>
-            <td>Дальневосточный пр., д. 71</td>
-            <td>Общежитие Дальневосточное, входная зона</td>
-            <td>ссылка на фото-1</td>
-            <td>
-              <button type="button" className="btn btn-info">
-                Добавить
-              </button>
-            </td>
-            <a href="/window">
-              {' '}
-              <td>ссылка на страницу</td>
-            </a>
-          </tr>
-          <tr>
-            <th scope="row">2</th>
-            <td>Jacob</td>
-            <td>Thornton</td>
-            <td>@fat</td>
-          </tr>
-          <tr>
-            <th scope="row">3</th>
-            <td colSpan="2">Larry the Bird</td>
-            <td>@twitter</td>
-          </tr>
+          {educations?.map((education) => (
+            <OneTabl key={education.id} education={education} user={user} />
+          ))}
         </tbody>
       </table>
     </>

@@ -61,4 +61,14 @@ router.post('/upload', isAdmin, upload.single('file'), async (req, res) => {
   }
 });
 
+// router.get('/education', async (req, res) => {
+//   try {
+//     const education = await Education.findAll();
+//     res.json(education);
+//   } catch (error) {
+//     console.log(error);
+//     res.sendStatus(500);
+//   }
+// });
+
 export default router;
