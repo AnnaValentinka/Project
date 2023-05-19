@@ -18,16 +18,6 @@ export default function TablForm({ posts, photos, user }) {
   //   console.log(`Посмотреть подробнее для поста с uuid: ${uuid}`);
   // };
 
-  const changeHandler = async (e) => {
-    axios.post('/api/photoAdd', {});
-  };
-
-  const addHandler = (e) => { };
-  //   // Обработчик для кнопки "Посмотреть подробgit merge mainнее"
-  //   // Можно выполнить нужные действия, используя uuid
-  //   console.log(`Посмотреть подробнее для поста с uuid: ${uuid}`);
-  // };
-
   const [allEntries, setAllEntries] = useState(posts);
   const [allPhotos, setAllPhotos] = useState(photos);
   const [input, setInput] = useState('');
