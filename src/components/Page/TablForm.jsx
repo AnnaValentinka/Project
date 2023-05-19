@@ -24,6 +24,7 @@ export default function TablForm({ posts, photos, user }) {
   const [inputPhoto, setInputPhoto] = useState('');
   const [inputEdit, setInputEdit] = useState('');
   const [isAdding, setIsAdding] = useState(null);
+  const [isAdding2, setIsAdding2] = useState(null);
 
   useEffect(() => {
     axios.post('/api/entries/search', { input }).then(({ data }) => setAllEntries(data));
@@ -62,7 +63,10 @@ export default function TablForm({ posts, photos, user }) {
     setIsAdding(id);
     console.log(id);
   };
-
+  const isAdditingHandler2 = (id) => {
+    setIsAdding2(id);
+    console.log(id);
+  };
   const handlerExcel = async () => {
     try {
       await axios.post('/api/download', { allEntries });
@@ -72,12 +76,11 @@ export default function TablForm({ posts, photos, user }) {
   };
   const handleRedirect = () => {
     if (user.admin === true) {
-      window.location = '/api/pars'
+      window.location = '/api/pars';
     } else {
-
-      window.location = '/home'
+      window.location = '/home';
     }
-  }
+  };
   return (
     <>
       <input
@@ -92,7 +95,14 @@ export default function TablForm({ posts, photos, user }) {
         <button className="btn btn-outline-success" type="button" onClick={handlerExcel}>
           Скачать
         </button>
-        <button className="btn btn-outline-warning" type="button" style={{ marginLeft: 860 }} onClick={handleRedirect}>Назад</button>
+        <button
+          className="btn btn-outline-warning"
+          type="button"
+          style={{ marginLeft: 860 }}
+          onClick={handleRedirect}
+        >
+          Назад
+        </button>
         <button type="button" className="btn btn-danger" onClick={handleLogout}>
           Выход
         </button>
@@ -126,7 +136,7 @@ export default function TablForm({ posts, photos, user }) {
                 <td>
                   {arr.map((photo, photoIndex) => (
                     <div key={photo.id}>
-                      {isAdding === photo.id ? (
+                      {isAdding2 === photo.id ? (
                         <>
                           <input
                             type="text"
@@ -138,7 +148,7 @@ export default function TablForm({ posts, photos, user }) {
                             type="button"
                             onClick={() => {
                               changeHandler(post.id, photo.id, inputEdit);
-                              setIsAdding(null);
+                              setIsAdding2(null);
                             }}
                           >
                             изменить
@@ -149,7 +159,7 @@ export default function TablForm({ posts, photos, user }) {
                           <a href={photo.urlPhoto} target="_blank" rel="noopener noreferrer">
                             Фото {photoIndex + 1}
                           </a>
-                          <button type="button" onClick={() => isAdditingHandler(post.id)}>
+                          <button type="button" onClick={() => isAdditingHandler2(photo.id)}>
                             Изменить
                           </button>
                         </>

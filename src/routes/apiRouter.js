@@ -208,7 +208,6 @@ router.patch('/photoChange', async (req, res) => {
   const eduId = req.body.id;
   const data = req.body.input;
   const { pId } = req.body;
-  console.log(req.body);
   const photo = await Photo.findOne({ where: { education_id: eduId, id: pId } });
   if (!photo) {
     return res.status(404).json({ error: 'Фотография не найдена' });
@@ -227,7 +226,7 @@ router.post('/download', async (req, res) => {
 
     allEntries.forEach((el) => {
       arr.push(
-        Education.findOne({
+        Education.findAll({
           include: Photo,
           where: {
             [Op.or]: [
