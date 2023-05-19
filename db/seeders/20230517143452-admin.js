@@ -17,7 +17,7 @@ module.exports = {
       {
         name: 'admin',
         password: passwordHash,
-        email: '1@1',
+        email: 'admin@admin',
         admin: true,
         createdAt: new Date(),
         updatedAt: new Date(),

@@ -2,6 +2,7 @@
 /* eslint-disable no-restricted-syntax */
 import express from 'express';
 import { v4 as uuidv4 } from 'uuid';
+import { Op } from 'sequelize';
 import isAdmin from '../middlewares/isAdmin';
 import { Education, Photo } from '../../db/models';
 
@@ -45,15 +46,18 @@ router.post('/upload', isAdmin, upload.single('file'), async (req, res) => {
         advertising: data['Описание места размещения РИМ'],
         uuID: uuidv4(),
       });
+      const educationId = education.id; // Получаем ID созданного поста
 
-      // Создание записи фото, связанной с  адрессом
-      // await Photo.create({
-      //   education_id: data[],
-      //   urlPhoto: data[],
-
-      // });
+      const photoFields = Object.keys(data).filter((key) => key.startsWith('Фото'));
+      for (const field of photoFields) {
+        if (data[field]) {
+          await Photo.create({
+            education_id: educationId,
+            urlPhoto: data[field],
+          });
+        }
+      }
     }
-    res.sendStatus(200);
     // res.json({ message: 'File uploaded and data saved successfully' });
   } catch (error) {
     console.log('Error uploading file:', error);
@@ -61,14 +65,29 @@ router.post('/upload', isAdmin, upload.single('file'), async (req, res) => {
   }
 });
 
-// router.get('/education', async (req, res) => {
-//   try {
-//     const education = await Education.findAll();
-//     res.json(education);
-//   } catch (error) {
-//     console.log(error);
-//     res.sendStatus(500);
-//   }
+router.post('/entries/search', async (req, res) => {
+  // console.log(req.body);
+  try {
+    const searchedData = await Education.findAll({
+      where: {
+        [Op.or]: [
+          { city: { [Op.substring]: req.body.input } },
+          { name: { [Op.substring]: req.body.input } },
+          { address: { [Op.substring]: req.body.input } },
+          { advertising: { [Op.substring]: req.body.input } },
+        ],
+      },
+    });
+    res.json(searchedData);
+  } catch (err) {
+    console.log(err);
+  }
+});
+//   where: { city: { [Op.substring]: req.body.input } },
+//   where: { name: { [Op.substring]: req.body.input } },
+// });
+// res.json(searchedData);
+// console.log(searchedData);
 // });
 
 export default router;

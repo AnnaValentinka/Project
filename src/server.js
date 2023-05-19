@@ -47,6 +47,6 @@ app.use((req, res, next) => {
 app.use('/', indexRouter);
 app.use('/api', apiRouter);
 app.use('/auth', authRouter);
-app.use('/table', viewRouter);
+// app.use('/table', viewRouter);
 
 app.listen(PORT, () => console.log(`App has started on port ${PORT}`));

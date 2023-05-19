@@ -8,17 +8,19 @@ import AuthForm from './Page/AuthForm';
 import TablForm from './Page/TablForm';
 import ParsForm from './Page/ParsForm';
 import WindowForm from './Page/WindowForm';
+import HomeForm from './Page/HomeForm';
 
-export default function App({ user, educations }) {
+export default function App({ user, posts, photos, post }) {
   return (
     <div className="container">
       <NavBar />
       <Routes>
         <Route path="/" element={<Main />} />
         <Route path="/authform" element={<AuthForm />} />
-        <Route path="/table" element={<TablForm />} />
-        <Route path="/api/pars" element={<ParsForm user={user} educations={educations} />} />
-        <Route path="/window" element={<WindowForm />} />
+        <Route path="/table" element={<TablForm posts={posts} photos={photos} user={user} />} />
+        <Route path="/api/pars" element={<ParsForm user={user} />} />
+        <Route path="/window/:id" element={<WindowForm post={post} photos={photos} />} />
+        <Route path="/home" element={<HomeForm user={user} />} />
 
         <Route path="/auth/login" element={<LoginPage user={user} />} />
         <Route path="/auth/signup" element={<SignUpPage />} />
