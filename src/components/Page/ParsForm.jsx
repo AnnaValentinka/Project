@@ -2,6 +2,22 @@ import React from 'react';
 import axios from 'axios';
 
 export default function ParsForm({ user }) {
+  const handleUpdateData = async () => {
+    try {
+      const file = event.target.files[0];
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const res = await axios.put('/api/update', formData); // Отправка запроса PUT на /api/update
+      console.log('Data updated successfully');
+      if (res.status === 200) {
+        window.location = '/table'; // Перенаправление на страницу таблицы после обновления данных
+      }
+    } catch (error) {
+      console.log('Error updating data:', error);
+    }
+  };
+
   const handleFileUpload = async (event) => {
     const file = event.target.files[0];
     const formData = new FormData();
@@ -76,8 +92,10 @@ export default function ParsForm({ user }) {
       <div style={styles.container}>
         <h2 style={styles.greeting}>Добро пожаловать, {user.name}!</h2>
         <div style={styles.inputContainer}>
+          Добавить таблицу
           <input type="file" onChange={handleFileUpload} style={styles.input} />
-          {/* <input type="button" onClick={() => (window.location = '/table')} value="Перезаписать" /> */}
+          Изменить таблицу
+          <input type="file" onChange={handleUpdateData} style={styles.input} />
         </div>
       </div>
     </>
