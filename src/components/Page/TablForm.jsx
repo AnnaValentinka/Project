@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
 export default function TablForm({ posts, photos }) {
   const handleLogout = async () => {
@@ -11,38 +11,63 @@ export default function TablForm({ posts, photos }) {
     }
   };
 
-
   // const handleDetailsClick = (uuid) => {
+
+  //   // Обработчик для кнопки "Посмотреть подробgit merge mainнее"
+  //   // Можно выполнить нужные действия, используя uuid
+  //   console.log(`Посмотреть подробнее для поста с uuid: ${uuid}`);
+  // };
 
   //   // Обработчик для кнопки "Посмотреть подробнее"
   //   // Можно выполнить нужные действия, используя uuid
   //   console.log(`Посмотреть подробнее для поста с uuid: ${uuid}`);
   // };
 
-  const changeHandler = async (e) => {
-    axios.post('/api/photoAdd', {});
-  };
-
-  const addHandler = (e) => {};
-  //   // Обработчик для кнопки "Посмотреть подробgit merge mainнее"
-  //   // Можно выполнить нужные действия, используя uuid
-  //   console.log(`Посмотреть подробнее для поста с uuid: ${uuid}`);
-  // };
-
   const [allEntries, setAllEntries] = useState(posts);
+  const [allPhotos, setAllPhotos] = useState(photos);
   const [input, setInput] = useState('');
+  const [inputPhoto, setInputPhoto] = useState('');
+  const [isAdding, setIsAdding] = useState(null);
 
   useEffect(() => {
     axios.post('/api/entries/search', { input }).then(({ data }) => setAllEntries(data));
   }, [input]);
 
+  const changeHandler = async (e) => {
+    const newPhoto = {
+      photo: e.target.value,
+    };
+    axios.patch('/api/photoAdd', { newPhoto });
+  };
+
+  const addHandler = async (id, data) => {
+    console.log('-------==========-------', data);
+    const res = await axios.post('/api/photoAdd', { id, input: data });
+    console.log(res.data);
+    if (res.status === 200) {
+      setAllPhotos((prev) =>
+        prev.map((el) => {
+          if (el.education_id === id) {
+            return res.data;
+          }
+          return el;
+        }),
+      );
+    }
+  };
+
+  const isAdditingHandler = (id) => {
+    setIsAdding(id);
+    console.log(id);
+  };
+
   const handlerExcel = async () => {
     try {
-      await axios.post('/api/download', { allEntries })
+      await axios.post('/api/download', { allEntries });
     } catch (err) {
       console.log(err);
     }
-  }
+  };
   return (
     <>
       <input
@@ -77,7 +102,8 @@ export default function TablForm({ posts, photos }) {
         </thead>
         <tbody>
           {allEntries.map((post, index) => {
-            const arr = photos.filter((photo) => photo.education_id === post.id);
+            console.log(post);
+            const arr = allPhotos.filter((photo) => photo.education_id === post.id);
 
             return (
               <tr key={post.id}>
@@ -95,11 +121,30 @@ export default function TablForm({ posts, photos }) {
                       <button type="button" onClick={changeHandler}>
                         Изменить
                       </button>
-                      {arr.length === 1 && (
-                        <button type="button" onClick={addHandler}>
-                          добавить
-                        </button>
-                      )}
+                      {arr.length === 1 &&
+                        (isAdding === post.id ? (
+                          <>
+                            <input
+                              type="text"
+                              name="newPhoto"
+                              value={inputPhoto}
+                              onChange={(e) => setInputPhoto(e.target.value)}
+                            />
+                            <button
+                              type="button"
+                              onClick={() => {
+                                addHandler(post.id, inputPhoto);
+                                setIsAdding(null);
+                              }}
+                            >
+                              Добавить
+                            </button>
+                          </>
+                        ) : (
+                          <button type="button" onClick={() => isAdditingHandler(post.id)}>
+                            добавить
+                          </button>
+                        ))}
                     </div>
                   ))}
                 </td>

@@ -193,6 +193,17 @@ router.post('/entries/search', async (req, res) => {
   }
 });
 
+router.post('/photoAdd', async (req, res) => {
+  const eduId = req.body.id;
+  const data = req.body.input;
+  console.log(req.body);
+  const foto = await Photo.create({
+    education_id: eduId,
+    urlPhoto: data,
+  });
+  res.json(foto);
+});
+
 router.post('/download', async (req, res) => {
   const test = await Photo.findAll();
   console.log(test);
