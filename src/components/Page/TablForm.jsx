@@ -2,7 +2,6 @@ import React from 'react';
 import OneTabl from './OneTabl';
 
 export default function TablForm({ user, educations }) {
-  const []
   return (
     <>
       <form className="d-flex" role="search" style={{ marginTop: 20 }}>
