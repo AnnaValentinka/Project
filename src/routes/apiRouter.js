@@ -123,6 +123,20 @@ router.post('/photoAdd', async (req, res) => {
   res.json(foto);
 });
 
+router.patch('/photoChange', async (req, res) => {
+  const eduId = req.body.id;
+  const data = req.body.input;
+  const { pId } = req.body;
+  console.log(req.body);
+  const photo = await Photo.findOne({ where: { education_id: eduId, id: pId } });
+  if (!photo) {
+    return res.status(404).json({ error: 'Фотография не найдена' });
+  }
+  photo.urlPhoto = data;
+  await photo.save();
+  return res.json(photo);
+});
+
 router.post('/download', async (req, res) => {
   const test = await Photo.findAll();
   console.log(test);
