@@ -3,8 +3,12 @@
 import express from 'express';
 import { v4 as uuidv4 } from 'uuid';
 import { Op, Sequelize } from 'sequelize';
+import { createWriteStream } from 'fs';
 import isAdmin from '../middlewares/isAdmin';
 import { Education, Photo } from '../../db/models';
+
+const ExcelJS = require('exceljs');
+// const fs = require('fs/promises');
 
 const multer = require('multer');
 
@@ -119,9 +123,88 @@ router.post('/photoAdd', async (req, res) => {
   res.json(foto);
 });
 
-// { city: { [Op.substring]: Sequelize.fn('Lower', req.body.input.toLowerCase()) } },
-// { name: { [Op.substring]: req.body.input } },
-// { address: { [Op.substring]: req.body.input } },
-// { advertising: { [Op.substring]: req.body.input } },
+router.post('/download', async (req, res) => {
+  const test = await Photo.findAll();
+  console.log(test);
+  try {
+    const { allEntries } = req.body;
+    const arr = [];
+
+    allEntries.forEach((el) => {
+      arr.push(
+        Education.findOne({
+          include: Photo,
+          where: {
+            [Op.or]: [
+              { city: { [Op.like]: `%${el.city}%` } },
+              { name: { [Op.like]: `%${el.name}%` } },
+              { address: { [Op.like]: `%${el.address}%` } },
+              { advertising: { [Op.like]: `%${el.advertising}%` } },
+              { uuID: { [Op.like]: `%${el.uuID}%` } },
+            ],
+          },
+        }),
+      );
+    });
+
+    const filterMap = await Promise.all(arr);
+
+    console.log({ filterMap });
+    // Создание нового Excel-документа
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('Data');
+
+    // Заголовки столбцов
+    worksheet.addRow([
+      'Город',
+      'УЗ',
+      'Адрес',
+      'Описание места размещения РИМ',
+      'Фото 1',
+      'Фото 2',
+      'Ссылка на страницу',
+    ]);
+
+    //  console.log('--------------------------------------', filterMap);
+    // Добавление отфильтрованных данных в Excel-документ
+    filterMap.forEach((row) => {
+      console.log({ row });
+      // filteredData.forEach((row) => {
+      // Добавление данных в Excel-документ
+
+      worksheet.addRow([
+        row.city,
+        row.name,
+        row.address,
+        row.advertising,
+        row.Photos?.map((el) => el.urlPhoto).join(', '), // Замените на соответствующие значения столбцов фото
+        row.pageLink,
+      ]);
+    });
+
+    // Создание потока для записи данных в файл
+    const stream = createWriteStream('filtered_data.xlsx');
+
+    // Сохранение Excel-документа в поток
+    await workbook.xlsx.write(stream);
+
+    // Завершение потока записи в файл
+    stream.end();
+
+    // Установка заголовков и типа контента для ответа
+    res.setHeader(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    );
+    res.setHeader('Content-Disposition', 'attachment; filename=filtered_data.xlsx');
+
+    // Отправка файла в ответе
+    res.sendFile('filtered_data.xlsx', { root: '.' });
+  } catch (error) {
+    console.error('Ошибка при скачивании данных:', error);
+    res.status(500).json({ success: false, message: 'Ошибка при скачивании данных' });
+  }
+});
 
 export default router;

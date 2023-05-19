@@ -10,7 +10,14 @@ export default function TablForm({ posts, photos }) {
       console.log('Ошибка при выходе:', error);
     }
   };
+
   // const handleDetailsClick = (uuid) => {
+
+  //   // Обработчик для кнопки "Посмотреть подробgit merge mainнее"
+  //   // Можно выполнить нужные действия, используя uuid
+  //   console.log(`Посмотреть подробнее для поста с uuid: ${uuid}`);
+  // };
+
   //   // Обработчик для кнопки "Посмотреть подробнее"
   //   // Можно выполнить нужные действия, используя uuid
   //   console.log(`Посмотреть подробнее для поста с uuid: ${uuid}`);
@@ -52,6 +59,13 @@ export default function TablForm({ posts, photos }) {
     console.log(id);
   };
 
+  const handlerExcel = async () => {
+    try {
+      await axios.post('/api/download', { allEntries });
+    } catch (err) {
+      console.log(err);
+    }
+  };
   return (
     <>
       <input
@@ -63,7 +77,7 @@ export default function TablForm({ posts, photos }) {
         onChange={(e) => setInput(e.target.value)}
       />
       <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 10 }}>
-        <button className="btn btn-outline-success" type="submit">
+        <button className="btn btn-outline-success" type="submit" onClick={handlerExcel}>
           Скачать
         </button>
         <button type="button" className="btn btn-danger" onClick={handleLogout}>
