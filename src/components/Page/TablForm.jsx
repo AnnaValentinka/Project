@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-export default function TablForm({ posts, photos }) {
+export default function TablForm({ posts, photos, user }) {
   const handleLogout = async () => {
     try {
       await axios.get('/auth/logout');
@@ -14,11 +14,6 @@ export default function TablForm({ posts, photos }) {
   // const handleDetailsClick = (uuid) => {
 
   //   // Обработчик для кнопки "Посмотреть подробgit merge mainнее"
-  //   // Можно выполнить нужные действия, используя uuid
-  //   console.log(`Посмотреть подробнее для поста с uuid: ${uuid}`);
-  // };
-
-  //   // Обработчик для кнопки "Посмотреть подробнее"
   //   // Можно выполнить нужные действия, используя uuid
   //   console.log(`Посмотреть подробнее для поста с uuid: ${uuid}`);
   // };
@@ -75,6 +70,14 @@ export default function TablForm({ posts, photos }) {
       console.log(err);
     }
   };
+  const handleRedirect = () => {
+    if (user.admin === true) {
+      window.location = '/api/pars'
+    } else {
+
+      window.location = '/home'
+    }
+  }
   return (
     <>
       <input
@@ -86,9 +89,10 @@ export default function TablForm({ posts, photos }) {
         onChange={(e) => setInput(e.target.value)}
       />
       <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 10 }}>
-        <button className="btn btn-outline-success" type="submit" onClick={handlerExcel}>
+        <button className="btn btn-outline-success" type="button" onClick={handlerExcel}>
           Скачать
         </button>
+        <button className="btn btn-outline-warning" type="button" style={{ marginLeft: 860 }} onClick={handleRedirect}>Назад</button>
         <button type="button" className="btn btn-danger" onClick={handleLogout}>
           Выход
         </button>
