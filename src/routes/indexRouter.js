@@ -1,10 +1,12 @@
 import express from 'express';
-import { where } from 'sequelize';
 import { Education, Photo } from '../../db/models';
 
 const router = express.Router();
 
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
+  res.render('Layout', {});
+});
+router.get('/home', (req, res) => {
   res.render('Layout', {});
 });
 router.get('/home', (req, res) => {

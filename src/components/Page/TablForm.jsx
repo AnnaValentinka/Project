@@ -13,6 +13,17 @@ export default function TablForm({ posts, photos }) {
 
 
   // const handleDetailsClick = (uuid) => {
+
+  //   // Обработчик для кнопки "Посмотреть подробнее"
+  //   // Можно выполнить нужные действия, используя uuid
+  //   console.log(`Посмотреть подробнее для поста с uuid: ${uuid}`);
+  // };
+
+  const changeHandler = async (e) => {
+    axios.post('/api/photoAdd', {});
+  };
+
+  const addHandler = (e) => {};
   //   // Обработчик для кнопки "Посмотреть подробgit merge mainнее"
   //   // Можно выполнить нужные действия, используя uuid
   //   console.log(`Посмотреть подробнее для поста с uuid: ${uuid}`);
@@ -65,31 +76,41 @@ export default function TablForm({ posts, photos }) {
           </tr>
         </thead>
         <tbody>
-          {allEntries.map((post, index) => (
-            <tr key={post.id}>
-              <th scope="row">{index + 1}</th>
-              <td>{post.city}</td>
-              <td>{post.name}</td>
-              <td>{post.address}</td>
-              <td>{post.advertising}</td>
-              <td>
-                {photos
-                  .filter((photo) => photo.education_id === post.id)
-                  .map((photo, photoIndex) => (
+          {allEntries.map((post, index) => {
+            const arr = photos.filter((photo) => photo.education_id === post.id);
+
+            return (
+              <tr key={post.id}>
+                <th scope="row">{index + 1}</th>
+                <td>{post.city}</td>
+                <td>{post.name}</td>
+                <td>{post.address}</td>
+                <td>{post.advertising}</td>
+                <td>
+                  {arr.map((photo, photoIndex) => (
                     <div key={photo.id}>
                       <a href={photo.urlPhoto} target="_blank" rel="noopener noreferrer">
                         Фото {photoIndex + 1}
                       </a>
+                      <button type="button" onClick={changeHandler}>
+                        Изменить
+                      </button>
+                      {arr.length === 1 && (
+                        <button type="button" onClick={addHandler}>
+                          добавить
+                        </button>
+                      )}
                     </div>
                   ))}
-              </td>
-              <td>
-                <a href={`/window/${post.uuID}`} className="btn btn-info">
-                  Посмотреть подробнее
-                </a>
-              </td>
-            </tr>
-          ))}
+                </td>
+                <td>
+                  <a href={`/window/${post.uuID}`} className="btn btn-info">
+                    Посмотреть подробнее
+                  </a>
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </>
