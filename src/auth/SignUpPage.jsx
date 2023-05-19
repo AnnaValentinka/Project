@@ -48,7 +48,7 @@ export default function SignUpPage() {
           />
         </label>
       </div>
-      <button type="submit">Регистрация</button>
+      <button type="submit" className="btn btn-success">зарегистрироваться</button>
     </form>
   );
 }
