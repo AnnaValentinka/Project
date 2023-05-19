@@ -6,7 +6,7 @@ export default function LoginPage() {
     e.preventDefault();
     const res = await axios.post('/auth/login', Object.fromEntries(new FormData(e.target)));
     if (res.status === 200) {
-      window.location = '/api/pars'; // Перенаправление для администратора
+      window.location = '/home'; // Перенаправление для администратора
     }
   };
 

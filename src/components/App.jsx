@@ -8,6 +8,8 @@ import AuthForm from './Page/AuthForm';
 import TablForm from './Page/TablForm';
 import ParsForm from './Page/ParsForm';
 import WindowForm from './Page/WindowForm';
+import HomeForm from './Page/HomeForm';
+
 
 export default function App({ user, posts, photos, post }) {
   console.log(user);
@@ -21,6 +23,7 @@ export default function App({ user, posts, photos, post }) {
         <Route path="/table" element={<TablForm posts={posts} photos={photos} user={user} />} />
         <Route path="/api/pars" element={<ParsForm user={user} />} />
         <Route path="/window/:id" element={<WindowForm post={post} photos={photos} />} />
+        <Route path="/home" element={<HomeForm user={user} />} />
 
         <Route path="/auth/login" element={<LoginPage user={user} />} />
         <Route path="/auth/signup" element={<SignUpPage />} />

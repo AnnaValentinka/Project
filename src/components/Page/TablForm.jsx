@@ -1,8 +1,14 @@
 import React from 'react';
 
 export default function TablForm({ posts, photos }) {
-  // console.log(posts);
-
+  const handleLogout = async () => {
+    try {
+      await axios.post('/auth/logout');
+      window.location = '/'; // Перенаправление на главную страницу после выхода
+    } catch (error) {
+      console.log('Ошибка при выходе:', error);
+    }
+  };
   const handleDetailsClick = (uuid) => {
     // Обработчик для кнопки "Посмотреть подробнее"
     // Можно выполнить нужные действия, используя uuid
