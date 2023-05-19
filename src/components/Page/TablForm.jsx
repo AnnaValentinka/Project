@@ -1,27 +1,30 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 
 export default function TablForm({ posts, photos }) {
-  // console.log(posts);
 
-  const handleDetailsClick = (uuid) => {
-    // Обработчик для кнопки "Посмотреть подробнее"
-    // Можно выполнить нужные действия, используя uuid
-    console.log(`Посмотреть подробнее для поста с uuid: ${uuid}`);
-  };
+  const [allEntries, setAllEntries] = useState(posts);
+  const [input, setInput] = useState('');
+
+  useEffect(() => {
+    axios.post('/api/entries/search', { input }).then(({ data }) => setAllEntries(data));
+  }, [input])
 
   return (
     <>
-      <form className="d-flex" role="search" style={{ marginTop: 20 }}>
-        <input
-          className="form-control me-2"
-          type="search"
-          placeholder="Search"
-          aria-label="Search"
-        />
-        <button className="btn btn-outline-success" type="submit">
-          Search
-        </button>
-      </form>
+      {/* <form name='' className="d-flex" role="search" style={{ marginTop: 20 }}> */}
+      <input
+        className="form-control me-2"
+        type="search"
+        placeholder="Search"
+        aria-label="Search"
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
+      />
+      <button className="btn btn-outline-success" type="submit">
+        Search
+      </button>
+      {/* </form> */}
       <table className="table">
         <thead>
           <tr>
@@ -37,7 +40,7 @@ export default function TablForm({ posts, photos }) {
           </tr>
         </thead>
         <tbody>
-          {posts.map((post, index) => (
+          {allEntries.map((post, index) => (
             <tr key={post.id}>
               <th scope="row">{index + 1}</th>
               <td>{post.city}</td>

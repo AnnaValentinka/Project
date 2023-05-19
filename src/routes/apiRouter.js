@@ -2,6 +2,7 @@
 /* eslint-disable no-restricted-syntax */
 import express from 'express';
 import { v4 as uuidv4 } from 'uuid';
+import { Op } from 'sequelize';
 import isAdmin from '../middlewares/isAdmin';
 import { Education, Photo } from '../../db/models';
 
@@ -63,5 +64,30 @@ router.post('/upload', isAdmin, upload.single('file'), async (req, res) => {
     res.status(500).json({ message: 'Error uploading file' });
   }
 });
+
+router.post('/entries/search', async (req, res) => {
+  // console.log(req.body);
+  try {
+    const searchedData = await Education.findAll({
+      where: {
+        [Op.or]: [
+          { city: { [Op.substring]: req.body.input } },
+          { name: { [Op.substring]: req.body.input } },
+          { address: { [Op.substring]: req.body.input } },
+          { advertising: { [Op.substring]: req.body.input } },
+        ],
+      },
+    });
+    res.json(searchedData);
+  } catch (err) {
+    console.log(err);
+  }
+});
+//   where: { city: { [Op.substring]: req.body.input } },
+//   where: { name: { [Op.substring]: req.body.input } },
+// });
+// res.json(searchedData);
+// console.log(searchedData);
+// });
 
 export default router;
