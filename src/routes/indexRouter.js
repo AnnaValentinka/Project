@@ -1,10 +1,12 @@
 import express from 'express';
-import { where } from 'sequelize';
 import { Education, Photo } from '../../db/models';
 
 const router = express.Router();
 
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
+  res.render('Layout', {});
+});
+router.get('/home', (req, res) => {
   res.render('Layout', {});
 });
 router.get('/home', (req, res) => {
@@ -30,28 +32,6 @@ router.get('/window/:id', async (req, res) => {
 
     res.set('Access-Control-Allow-Origin', '*'); // Устанавливаем заголовок CORS
 
-    res.render('Layout', initState);
-  } catch (error) {
-    console.log('Error fetching post and photos:', error);
-    res.status(500).json({ message: 'Error fetching post and photos' });
-  }
-});
-
-router.get('/window/:id', async (req, res) => {
-  try {
-    const uuID = req.params.id;
-    const post = await Education.findOne({ where: { uuID } });
-    const postPhotos = await Photo.findAll({
-      where: {
-        education_id: post.id,
-      },
-    });
-
-    const initState = {
-      post,
-      photo: postPhotos,
-    };
-    console.log(photo);
     res.render('Layout', initState);
   } catch (error) {
     console.log('Error fetching post and photos:', error);

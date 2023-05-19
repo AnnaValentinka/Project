@@ -10,10 +10,7 @@ import ParsForm from './Page/ParsForm';
 import WindowForm from './Page/WindowForm';
 import HomeForm from './Page/HomeForm';
 
-
 export default function App({ user, posts, photos, post }) {
-  console.log(user);
-
   return (
     <div className="container">
       <NavBar />
