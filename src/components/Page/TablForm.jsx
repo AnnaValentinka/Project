@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
 export default function TablForm({ posts, photos }) {
   const handleLogout = async () => {
@@ -11,7 +11,7 @@ export default function TablForm({ posts, photos }) {
     }
   };
   // const handleDetailsClick = (uuid) => {
-  //   // Обработчик для кнопки "Посмотреть подробнее"
+  //   // Обработчик для кнопки "Посмотреть подробgit merge mainнее"
   //   // Можно выполнить нужные действия, используя uuid
   //   console.log(`Посмотреть подробнее для поста с uuid: ${uuid}`);
   // };
@@ -25,12 +25,6 @@ export default function TablForm({ posts, photos }) {
 
   return (
     <>
-      <div className="d-flex justify-content-end mb-3">
-        <button type="button" className="btn btn-danger" onClick={handleLogout}>
-          Выход
-        </button>
-      </div>
-      {/* <form name='' className="d-flex" role="search" style={{ marginTop: 20 }}> */}
       <input
         className="form-control me-2"
         type="search"
@@ -39,10 +33,14 @@ export default function TablForm({ posts, photos }) {
         value={input}
         onChange={(e) => setInput(e.target.value)}
       />
-      <button className="btn btn-outline-success" type="submit">
-        Search
-      </button>
-      {/* </form> */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 10 }}>
+        <button className="btn btn-outline-success" type="submit">
+          Скачать
+        </button>
+        <button type="button" className="btn btn-danger" onClick={handleLogout}>
+          Выход
+        </button>
+      </div>
       <table className="table">
         <thead>
           <tr>
