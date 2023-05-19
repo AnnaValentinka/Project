@@ -2,7 +2,7 @@
 /* eslint-disable no-restricted-syntax */
 import express from 'express';
 import { v4 as uuidv4 } from 'uuid';
-import { Op } from 'sequelize';
+import { Op, Sequelize } from 'sequelize';
 import isAdmin from '../middlewares/isAdmin';
 import { Education, Photo } from '../../db/models';
 
@@ -71,10 +71,34 @@ router.post('/entries/search', async (req, res) => {
     const searchedData = await Education.findAll({
       where: {
         [Op.or]: [
-          { city: { [Op.substring]: req.body.input } },
-          { name: { [Op.substring]: req.body.input } },
-          { address: { [Op.substring]: req.body.input } },
-          { advertising: { [Op.substring]: req.body.input } },
+          {
+            city: Sequelize.where(
+              Sequelize.fn('LOWER', Sequelize.col('city')),
+              'LIKE',
+              `%${req.body.input.toLowerCase()}%`,
+            ),
+          },
+          {
+            name: Sequelize.where(
+              Sequelize.fn('LOWER', Sequelize.col('name')),
+              'LIKE',
+              `%${req.body.input.toLowerCase()}%`,
+            ),
+          },
+          {
+            address: Sequelize.where(
+              Sequelize.fn('LOWER', Sequelize.col('address')),
+              'LIKE',
+              `%${req.body.input.toLowerCase()}%`,
+            ),
+          },
+          {
+            advertising: Sequelize.where(
+              Sequelize.fn('LOWER', Sequelize.col('advertising')),
+              'LIKE',
+              `%${req.body.input.toLowerCase()}%`,
+            ),
+          },
         ],
       },
     });
@@ -83,11 +107,21 @@ router.post('/entries/search', async (req, res) => {
     console.log(err);
   }
 });
-//   where: { city: { [Op.substring]: req.body.input } },
-//   where: { name: { [Op.substring]: req.body.input } },
-// });
-// res.json(searchedData);
-// console.log(searchedData);
-// });
+
+router.post('/photoAdd', async (req, res) => {
+  const eduId = req.body.id;
+  const data = req.body.input;
+  console.log(eduId);
+  const foto = await Photo.create({
+    education_id: eduId,
+    urlPhoto: data,
+  });
+  res.json(foto);
+});
+
+// { city: { [Op.substring]: Sequelize.fn('Lower', req.body.input.toLowerCase()) } },
+// { name: { [Op.substring]: req.body.input } },
+// { address: { [Op.substring]: req.body.input } },
+// { advertising: { [Op.substring]: req.body.input } },
 
 export default router;
