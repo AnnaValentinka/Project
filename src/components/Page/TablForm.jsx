@@ -22,22 +22,29 @@ export default function TablForm({ posts, photos, user }) {
   const [allPhotos, setAllPhotos] = useState(photos);
   const [input, setInput] = useState('');
   const [inputPhoto, setInputPhoto] = useState('');
+  const [inputEdit, setInputEdit] = useState('');
   const [isAdding, setIsAdding] = useState(null);
 
   useEffect(() => {
     axios.post('/api/entries/search', { input }).then(({ data }) => setAllEntries(data));
   }, [input]);
 
-  const changeHandler = async (e) => {
-    const newPhoto = {
-      photo: e.target.value,
-    };
-    axios.patch('/api/photoAdd', { newPhoto });
+  const changeHandler = async (id, pId, data) => {
+    const res = await axios.patch(`/api/photoChange/`, { id, pId, input: data });
+    if (res.status === 200) {
+      setAllPhotos((prev) =>
+        prev.map((el) => {
+          if (el.education_id === id) {
+            return res.data;
+          }
+          return el;
+        }),
+      );
+    }
   };
 
   const addHandler = async (id, data) => {
-    console.log('-------==========-------', data);
-    const res = await axios.post('/api/photoAdd', { id, input: data });
+    const res = await axios.post('/api/photoAdd/', { id, input: data });
     console.log(res.data);
     if (res.status === 200) {
       setAllPhotos((prev) =>
@@ -119,12 +126,34 @@ export default function TablForm({ posts, photos, user }) {
                 <td>
                   {arr.map((photo, photoIndex) => (
                     <div key={photo.id}>
-                      <a href={photo.urlPhoto} target="_blank" rel="noopener noreferrer">
-                        Фото {photoIndex + 1}
-                      </a>
-                      <button type="button" onClick={changeHandler}>
-                        Изменить
-                      </button>
+                      {isAdding === photo.id ? (
+                        <>
+                          <input
+                            type="text"
+                            name="newPhoto"
+                            value={inputEdit}
+                            onChange={(e) => setInputEdit(e.target.value)}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              changeHandler(post.id, photo.id, inputEdit);
+                              setIsAdding(null);
+                            }}
+                          >
+                            изменить
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <a href={photo.urlPhoto} target="_blank" rel="noopener noreferrer">
+                            Фото {photoIndex + 1}
+                          </a>
+                          <button type="button" onClick={() => isAdditingHandler(post.id)}>
+                            Изменить
+                          </button>
+                        </>
+                      )}
                       {arr.length === 1 &&
                         (isAdding === post.id ? (
                           <>
