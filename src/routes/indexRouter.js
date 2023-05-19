@@ -7,6 +7,9 @@ const router = express.Router();
 router.get('/', (req, res) => {
   res.render('Layout', {});
 });
+router.get('/home', (req, res) => {
+  res.render('Layout', {});
+});
 router.get('/window', (req, res) => {
   res.render('Layout', {});
 });
