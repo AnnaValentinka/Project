@@ -4,9 +4,14 @@ import React from 'react';
 export default function LoginPage() {
   const submitHandler = async (e) => {
     e.preventDefault();
-    const res = await axios.post('/auth/login', Object.fromEntries(new FormData(e.target)));
-    if (res.status === 200) {
-      window.location = '/home'; // Перенаправление для администратора
+    try {
+      const res = await axios.post('/auth/login', Object.fromEntries(new FormData(e.target)));
+      if (res.status === 200) {
+        window.location = '/home'; // Перенаправление для администратора
+      }
+    } catch (error) {
+      console.log('Error logging in:', error);
+      // Добавьте код обработки ошибки, например, показ сообщения об ошибке пользователю
     }
   };
 
@@ -36,7 +41,9 @@ export default function LoginPage() {
           />
         </label>
       </div>
-      <button type="submit" className="btn btn-success">Вход</button>
+      <button type="submit" className="btn btn-success">
+        Вход
+      </button>
     </form>
   );
 }

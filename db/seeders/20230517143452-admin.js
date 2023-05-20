@@ -14,14 +14,6 @@ module.exports = {
         createdAt: new Date(),
         updatedAt: new Date(),
       },
-      {
-        name: 'admin',
-        password: passwordHash,
-        email: 'admin@admin',
-        admin: true,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
     ]);
   },
 

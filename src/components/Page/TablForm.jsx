@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-no-useless-fragment */
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
@@ -11,13 +12,6 @@ export default function TablForm({ posts, photos, user }) {
     }
   };
 
-  // const handleDetailsClick = (uuid) => {
-
-  //   // Обработчик для кнопки "Посмотреть подробgit merge mainнее"
-  //   // Можно выполнить нужные действия, используя uuid
-  //   console.log(`Посмотреть подробнее для поста с uuid: ${uuid}`);
-  // };
-
   const [allEntries, setAllEntries] = useState(posts);
   const [allPhotos, setAllPhotos] = useState(photos);
   const [input, setInput] = useState('');
@@ -27,35 +21,47 @@ export default function TablForm({ posts, photos, user }) {
   const [isAdding2, setIsAdding2] = useState(null);
 
   useEffect(() => {
-    axios.post('/api/entries/search', { input }).then(({ data }) => setAllEntries(data));
+    try {
+      axios.post('/api/entries/search', { input }).then(({ data }) => setAllEntries(data));
+    } catch (error) {
+      console.log('Ошибка при выполнении useEffect:', error);
+    }
   }, [input]);
 
   const changeHandler = async (id, pId, data) => {
-    const res = await axios.patch(`/api/photoChange/`, { id, pId, input: data });
-    if (res.status === 200) {
-      setAllPhotos((prev) =>
-        prev.map((el) => {
-          if (el.education_id === id) {
-            return res.data;
-          }
-          return el;
-        }),
-      );
+    try {
+      const res = await axios.patch(`/api/photoChange/`, { id, pId, input: data });
+      if (res.status === 200) {
+        setAllPhotos((prev) =>
+          prev.map((el) => {
+            if (el.education_id === id) {
+              return res.data;
+            }
+            return el;
+          }),
+        );
+      }
+    } catch (error) {
+      console.log('Ошибка при изменении данных:', error);
     }
   };
 
   const addHandler = async (id, data) => {
-    const res = await axios.post('/api/photoAdd/', { id, input: data });
-    console.log(res.data);
-    if (res.status === 200) {
-      setAllPhotos((prev) =>
-        prev.map((el) => {
-          if (el.education_id === id) {
-            return res.data;
-          }
-          return el;
-        }),
-      );
+    try {
+      const res = await axios.post('/api/photoAdd/', { id, input: data });
+      console.log(res.data);
+      if (res.status === 200) {
+        setAllPhotos((prev) =>
+          prev.map((el) => {
+            if (el.education_id === id) {
+              return res.data;
+            }
+            return el;
+          }),
+        );
+      }
+    } catch (error) {
+      console.log('Ошибка при добавлении данных:', error);
     }
   };
 
@@ -70,17 +76,22 @@ export default function TablForm({ posts, photos, user }) {
   const handlerExcel = async () => {
     try {
       await axios.post('/api/download', { allEntries });
-    } catch (err) {
-      console.log(err);
+    } catch (error) {
+      console.log('Ошибка при обработке события:', error);
     }
   };
   const handleRedirect = () => {
-    if (user.admin === true) {
-      window.location = '/api/pars';
-    } else {
-      window.location = '/home';
+    try {
+      if (user.admin === true) {
+        window.location = '/api/pars';
+      } else {
+        window.location = '/home';
+      }
+    } catch (error) {
+      console.log('Ошибка при обработке перенаправления:', error);
     }
   };
+
   return (
     <>
       <input
@@ -123,9 +134,7 @@ export default function TablForm({ posts, photos, user }) {
         </thead>
         <tbody>
           {allEntries.map((post, index) => {
-            console.log(post);
             const arr = allPhotos.filter((photo) => photo.education_id === post.id);
-
             return (
               <tr key={post.id}>
                 <th scope="row">{index + 1}</th>
@@ -136,58 +145,70 @@ export default function TablForm({ posts, photos, user }) {
                 <td>
                   {arr.map((photo, photoIndex) => (
                     <div key={photo.id}>
-                      {isAdding2 === photo.id ? (
+                      {user.admin === true ? (
+                        // eslint-disable-next-line react/jsx-no-useless-fragment
                         <>
-                          <input
-                            type="text"
-                            name="newPhoto"
-                            value={inputEdit}
-                            onChange={(e) => setInputEdit(e.target.value)}
-                          />
-                          <button
-                            type="button"
-                            onClick={() => {
-                              changeHandler(post.id, photo.id, inputEdit);
-                              setIsAdding2(null);
-                            }}
-                          >
-                            изменить
-                          </button>
+                          {isAdding2 === photo.id ? (
+                            <>
+                              <input
+                                type="text"
+                                name="newPhoto"
+                                value={inputEdit}
+                                onChange={(e) => setInputEdit(e.target.value)}
+                              />
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  changeHandler(post.id, photo.id, inputEdit);
+                                  setIsAdding2(null);
+                                }}
+                              >
+                                изменить
+                              </button>
+                            </>
+                          ) : (
+                            <>
+                              <a href={photo.urlPhoto} target="_blank" rel="noopener noreferrer">
+                                Фото {photoIndex + 1}
+                              </a>
+                              <button type="button" onClick={() => isAdditingHandler2(photo.id)}>
+                                Изменить
+                              </button>
+                            </>
+                          )}
                         </>
                       ) : (
+                        <a href={photo.urlPhoto} target="_blank" rel="noopener noreferrer">
+                          Фото {photoIndex + 1}
+                        </a>
+                      )}
+                      {arr.length === 1 && user.admin === true && (
                         <>
-                          <a href={photo.urlPhoto} target="_blank" rel="noopener noreferrer">
-                            Фото {photoIndex + 1}
-                          </a>
-                          <button type="button" onClick={() => isAdditingHandler2(photo.id)}>
-                            Изменить
-                          </button>
+                          {isAdding === post.id ? (
+                            <>
+                              <input
+                                type="text"
+                                name="newPhoto"
+                                value={inputPhoto}
+                                onChange={(e) => setInputPhoto(e.target.value)}
+                              />
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  addHandler(post.id, inputPhoto);
+                                  setIsAdding(null);
+                                }}
+                              >
+                                Добавить
+                              </button>
+                            </>
+                          ) : (
+                            <button type="button" onClick={() => isAdditingHandler(post.id)}>
+                              добавить
+                            </button>
+                          )}
                         </>
                       )}
-                      {arr.length === 1 &&
-                        (isAdding === post.id ? (
-                          <>
-                            <input
-                              type="text"
-                              name="newPhoto"
-                              value={inputPhoto}
-                              onChange={(e) => setInputPhoto(e.target.value)}
-                            />
-                            <button
-                              type="button"
-                              onClick={() => {
-                                addHandler(post.id, inputPhoto);
-                                setIsAdding(null);
-                              }}
-                            >
-                              Добавить
-                            </button>
-                          </>
-                        ) : (
-                          <button type="button" onClick={() => isAdditingHandler(post.id)}>
-                            добавить
-                          </button>
-                        ))}
                     </div>
                   ))}
                 </td>
