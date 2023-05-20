@@ -7,6 +7,8 @@ import { createWriteStream } from 'fs';
 import isAdmin from '../middlewares/isAdmin';
 import { Education, Photo } from '../../db/models';
 
+const path = require('path');
+
 const shortid = require('shortid');
 
 const ExcelJS = require('exceljs');
@@ -261,19 +263,33 @@ router.post('/download', async (req, res) => {
       });
     });
 
-    const stream = createWriteStream('filtered_data.xlsx');
+    const filePath = path.join(__dirname, 'filtered_data.xlsx');
+    const stream = createWriteStream(filePath);
 
     await workbook.xlsx.write(stream);
 
+    stream.on('finish', () => {
+      res.setHeader(
+        'Content-Type',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      );
+      res.setHeader('Content-Disposition', 'attachment; filename=filtered_data.xlsx');
+      res.download(filePath, 'filtered_data.xlsx', (err) => {
+        if (err) {
+          console.error('Ошибка при скачивании файла:', err);
+          res.status(500).json({ success: false, message: 'Ошибка при скачивании файла' });
+        }
+
+        // Удалите файл после скачивания, если это требуется
+        // fs.unlink(filePath, (unlinkErr) => {
+        //   if (unlinkErr) {
+        //     console.error('Ошибка при удалении файла:', unlinkErr);
+        //   }
+        // });
+      });
+    });
+
     stream.end();
-
-    res.setHeader(
-      'Content-Type',
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    );
-    res.setHeader('Content-Disposition', 'attachment; filename=filtered_data.xlsx');
-
-    res.sendFile('filtered_data.xlsx', { root: '.' });
   } catch (error) {
     console.error('Ошибка при скачивании данных:', error);
     res.status(500).json({ success: false, message: 'Ошибка при скачивании данных' });
