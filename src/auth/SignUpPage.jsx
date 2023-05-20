@@ -4,9 +4,14 @@ import React from 'react';
 export default function SignUpPage() {
   const submitHandler = async (e) => {
     e.preventDefault();
-    const res = await axios.post('/auth/signup', Object.fromEntries(new FormData(e.target)));
-    if (res.status === 200) {
-      window.location = '/home';
+    try {
+      const res = await axios.post('/auth/signup', Object.fromEntries(new FormData(e.target)));
+      if (res.status === 200) {
+        window.location = '/home';
+      }
+    } catch (error) {
+      console.log('Error signing up:', error);
+      // Добавьте код обработки ошибки, например, показ сообщения об ошибке пользователю
     }
   };
 
@@ -48,7 +53,9 @@ export default function SignUpPage() {
           />
         </label>
       </div>
-      <button type="submit" className="btn btn-success">зарегистрироваться</button>
+      <button type="submit" className="btn btn-success">
+        зарегистрироваться
+      </button>
     </form>
   );
 }

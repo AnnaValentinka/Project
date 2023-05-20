@@ -7,8 +7,9 @@ import { createWriteStream } from 'fs';
 import isAdmin from '../middlewares/isAdmin';
 import { Education, Photo } from '../../db/models';
 
+const shortid = require('shortid');
+
 const ExcelJS = require('exceljs');
-// const fs = require('fs/promises');
 
 const multer = require('multer');
 
@@ -17,38 +18,6 @@ const XLSX = require('xlsx');
 const upload = multer({ dest: 'public/uploads/' });
 
 const router = express.Router();
-
-// const storage = multer.diskStorage({
-//   destination: (req, file, cb) => {
-//     cb(null, 'uploadsPhoto/');
-//   },
-//   filename: (req, file, cb) => {
-//     cb(null, file.originalname);
-//   },
-// });
-// const uploadPhoto = multer({ storage });
-
-// router.post('/uploadPhoto', uploadPhoto.single('image'), async (req, res) => {
-//   try {
-//     // Получение информации о загруженном изображении
-//     const { filename, path } = req.file;
-
-//     // Сохранение информации об изображении в базе данных
-//     const photo = await Photo.create({ filename, filepath: path });
-
-//     // Сохранение изображения на Яндекс.Диске
-//     const yandexDiskClient = yandexDisk.createClient({
-//       token:
-//         'https://oauth.yandex.ru/authorize?response_type=token&client_id=<e76d1a0fe3b94f0dbcdd92f6cd0d4646>', // Замените на ваш токен Яндекс.Диска
-//     });
-//     await yandexDiskClient.uploadFile(path, `/images/${filename}`);
-
-//     res.status(200).json({ success: true, message: 'Изображение успешно загружено' });
-//   } catch (error) {
-//     console.error('Ошибка при загрузке изображения:', error);
-//     res.status(500).json({ success: false, message: 'Ошибка при загрузке изображения' });
-//   }
-// });
 
 router.get('/pars', (req, res) => {
   res.render('Layout', {});
@@ -69,7 +38,7 @@ router.post('/upload', isAdmin, upload.single('file'), async (req, res) => {
       }
     });
     const jsonData = XLSX.utils.sheet_to_json(worksheet);
-    console.log(jsonData);
+    // console.log(jsonData);
     // Обработка и сохранение данных в базу данных
     for (const data of jsonData) {
       const { city, name, address, advertising } = data;
@@ -151,7 +120,7 @@ router.put('/update', isAdmin, upload.single('file'), async (req, res) => {
 });
 
 router.post('/entries/search', async (req, res) => {
-  // console.log(req.body);
+  // console.log('--------------------------->', req.body);
   try {
     const searchedData = await Education.findAll({
       where: {
@@ -192,64 +161,69 @@ router.post('/entries/search', async (req, res) => {
     console.log(err);
   }
 });
-
 router.post('/photoAdd', async (req, res) => {
-  const eduId = req.body.id;
-  const data = req.body.input;
-  console.log(req.body);
-  const foto = await Photo.create({
-    education_id: eduId,
-    urlPhoto: data,
-  });
-  res.json(foto);
-});
-
-router.patch('/photoChange', async (req, res) => {
-  const eduId = req.body.id;
-  const data = req.body.input;
-  const { pId } = req.body;
-  const photo = await Photo.findOne({ where: { education_id: eduId, id: pId } });
-  if (!photo) {
-    return res.status(404).json({ error: 'Фотография не найдена' });
+  try {
+    const eduId = req.body.id;
+    const data = req.body.input;
+    // console.log(req.body);
+    const foto = await Photo.create({
+      education_id: eduId,
+      urlPhoto: data,
+    });
+    res.json(foto);
+  } catch (error) {
+    console.log('Error adding photo:', error);
+    res.status(500).json({ message: 'Error adding photo' });
   }
-  photo.urlPhoto = data;
-  await photo.save();
-  return res.json(photo);
+});
+router.patch('/photoChange', async (req, res) => {
+  try {
+    const eduId = req.body.id;
+    const data = req.body.input;
+    const { pId } = req.body;
+    const photo = await Photo.findOne({ where: { education_id: eduId, id: pId } });
+    if (!photo) {
+      return res.status(404).json({ error: 'Фотография не найдена' });
+    }
+    photo.urlPhoto = data;
+    await photo.save();
+    return res.json(photo);
+  } catch (error) {
+    console.log('Error changing photo:', error);
+    res.status(500).json({ message: 'Error changing photo' });
+  }
 });
 
 router.post('/download', async (req, res) => {
-  const test = await Photo.findAll();
-  console.log(test);
   try {
     const { allEntries } = req.body;
+
+    const uniqueIds = [];
     const arr = [];
 
     allEntries.forEach((el) => {
-      arr.push(
-        Education.findAll({
-          include: Photo,
-          where: {
-            [Op.or]: [
-              { city: { [Op.like]: `%${el.city}%` } },
-              { name: { [Op.like]: `%${el.name}%` } },
-              { address: { [Op.like]: `%${el.address}%` } },
-              { advertising: { [Op.like]: `%${el.advertising}%` } },
-              { uuID: { [Op.like]: `%${el.uuID}%` } },
-            ],
-          },
-        }),
-      );
+      if (!uniqueIds.includes(el.id)) {
+        uniqueIds.push(el.id);
+        arr.push(
+          Education.findAll({
+            include: Photo,
+            where: {
+              name: { [Op.like]: `%${el.name}%` },
+              address: { [Op.like]: `%${el.address}%` },
+              advertising: { [Op.like]: `%${el.advertising}%` },
+              uuID: { [Op.like]: `%${el.uuID}%` },
+            },
+          }),
+        );
+      }
     });
 
-    const filterMap = await Promise.all(arr);
-
-    console.log({ filterMap });
-    // Создание нового Excel-документа
+    const filterMaps = await Promise.all(arr);
+    const filterMap = JSON.parse(JSON.stringify(filterMaps));
 
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('Data');
 
-    // Заголовки столбцов
     worksheet.addRow([
       'Город',
       'УЗ',
@@ -260,45 +234,49 @@ router.post('/download', async (req, res) => {
       'Ссылка на страницу',
     ]);
 
-    //  console.log('--------------------------------------', filterMap);
-    // Добавление отфильтрованных данных в Excel-документ
     filterMap.forEach((row) => {
-      console.log({ row });
-      // filteredData.forEach((row) => {
-      // Добавление данных в Excel-документ
+      row.forEach((el) => {
+        const photos = el.Photos?.map((photo) => photo.urlPhoto);
 
-      worksheet.addRow([
-        row.city,
-        row.name,
-        row.address,
-        row.advertising,
-        row.Photos?.map((el) => el.urlPhoto).join(', '), // Замените на соответствующие значения столбцов фото
-        row.pageLink,
-      ]);
+        const pageLink = `${req.protocol}://${req.get('host')}/window/${el.uuID}`; // Формирование ссылки на страницу
+
+        worksheet.addRow([
+          el.city,
+          el.name,
+          el.address,
+          el.advertising,
+          { text: 'Фото', hyperlink: photos?.[0] || '' },
+          { text: 'Фото', hyperlink: photos?.[1] || '' },
+          { text: 'Посмотреть подробнее', hyperlink: pageLink }, // Добавление гиперссылки на страницу
+        ]);
+      });
     });
 
-    // Создание потока для записи данных в файл
+    worksheet.eachRow((row) => {
+      row.eachCell((cell) => {
+        const cellValue = cell.value;
+        if (cellValue && typeof cellValue.hyperlink === 'string') {
+          cell.value = { text: cellValue.text, hyperlink: cellValue.hyperlink };
+        }
+      });
+    });
+
     const stream = createWriteStream('filtered_data.xlsx');
 
-    // Сохранение Excel-документа в поток
     await workbook.xlsx.write(stream);
 
-    // Завершение потока записи в файл
     stream.end();
 
-    // Установка заголовков и типа контента для ответа
     res.setHeader(
       'Content-Type',
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     );
     res.setHeader('Content-Disposition', 'attachment; filename=filtered_data.xlsx');
 
-    // Отправка файла в ответе
     res.sendFile('filtered_data.xlsx', { root: '.' });
   } catch (error) {
     console.error('Ошибка при скачивании данных:', error);
     res.status(500).json({ success: false, message: 'Ошибка при скачивании данных' });
   }
 });
-
 export default router;

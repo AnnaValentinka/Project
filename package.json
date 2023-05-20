@@ -6,11 +6,12 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "babel-node src/server.js",
-    "start": "webpack -d eval-source-map && babel-node src/server.js",
     "webpack": "webpack -wd eval-source-map",
     "prep-db": "npx sequelize-cli db:drop && npx sequelize-cli db:create && npx sequelize-cli db:migrate && npx sequelize-cli db:seed:all",
     "launch": "npm run prep-db && webpack -d eval-source-map && babel-node src/server.js",
-    "deps": "npm i -D @babel/node @babel/preset-react @babel/preset-env eslint eslint-config-airbnb eslint-plugin-import eslint-plugin-jsx-a11y eslint-plugin-react eslint-plugin-react-hooks prettier eslint-config-prettier @babel/plugin-proposal-class-properties babel-loader webpack webpack-cli morgan sequelize-cli && npm i express react react-dom react-router-dom dotenv sequelize pg pg-hstore express-session session-file-store axios bcrypt"
+    "deps": "npm i -D @babel/node @babel/preset-react @babel/preset-env eslint eslint-config-airbnb eslint-plugin-import eslint-plugin-jsx-a11y eslint-plugin-react eslint-plugin-react-hooks prettier eslint-config-prettier @babel/plugin-proposal-class-properties babel-loader webpack webpack-cli morgan sequelize-cli && npm i express react react-dom react-router-dom dotenv sequelize pg pg-hstore express-session session-file-store axios bcrypt",
+    "build": "webpack -d eval-source-map && babel src --copy-files --out-dir distr",
+    "start": "node distr/server.js"
   },
   "keywords": [],
   "author": "",
@@ -35,6 +36,7 @@
     "webpack-cli": "^5.1.1"
   },
   "dependencies": {
+    "@babel/cli": "^7.21.5",
     "adm-zip": "^0.5.10",
     "axios": "^1.4.0",
     "bcrypt": "^5.1.0",
@@ -53,6 +55,7 @@
     "sequelize": "^6.31.1",
     "sequelize-extra": "^0.5.0",
     "session-file-store": "^1.5.0",
+    "shortid": "^2.2.16",
     "uuid": "^9.0.0",
     "xlsx": "^0.18.5",
     "yandex-disk": "^0.0.8"
