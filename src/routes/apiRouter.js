@@ -3,7 +3,7 @@
 import express from 'express';
 import { v4 as uuidv4 } from 'uuid';
 import { Op, Sequelize } from 'sequelize';
-import { createWriteStream } from 'fs';
+import { createWriteStream, fs } from 'fs';
 import isAdmin from '../middlewares/isAdmin';
 import { Education, Photo } from '../../db/models';
 
@@ -264,36 +264,26 @@ router.post('/download', async (req, res) => {
       });
     });
     // менять можно только что снизу
+    res.setHeader(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    );
+    res.setHeader('Content-Disposition', 'attachment; filename=filtered_data.xlsx');
+
     const filePath = path.join(__dirname, 'filtered_data.xlsx');
-    const stream = createWriteStream(filePath);
+    await workbook.xlsx.writeFile(filePath);
 
-    await workbook.xlsx.write(stream);
+    const fileStream = fs.createReadStream(filePath);
+    fileStream.pipe(res);
 
-    stream.on('finish', () => {
-      fs.readFile(filePath, (err, data) => {
-        if (err) {
-          console.error('Ошибка при чтении файла:', err);
-          res.status(500).json({ success: false, message: 'Ошибка при чтении файла' });
-        } else {
-          res.setHeader(
-            'Content-Type',
-            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-          );
-          res.setHeader('Content-Disposition', 'attachment; filename=filtered_data.xlsx');
-          res.send(data);
-          saveAs(data, 'filtered_data.xlsx'); // Скачивание файла в браузере с помощью file-saver
+    // Удалите файл после отправки, если это требуется
+    fileStream.on('finish', () => {
+      fs.unlink(filePath, (unlinkErr) => {
+        if (unlinkErr) {
+          console.error('Ошибка при удалении файла:', unlinkErr);
         }
-
-        // Удалите файл после скачивания, если это требуется
-        // fs.unlink(filePath, (unlinkErr) => {
-        //   if (unlinkErr) {
-        //     console.error('Ошибка при удалении файла:', unlinkErr);
-        //   }
-        // });
       });
     });
-
-    stream.end();
   } catch (error) {
     console.error('Ошибка при скачивании данных:', error);
     res.status(500).json({ success: false, message: 'Ошибка при скачивании данных' });
