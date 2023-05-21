@@ -75,7 +75,24 @@ export default function TablForm({ posts, photos, user }) {
   };
   const handlerExcel = async () => {
     try {
-      await axios.post('/api/download', { allEntries });
+      const response = await fetch('/api/download', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ allEntries }),
+      });
+
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'filtered_data.xlsx';
+        link.click();
+      } else {
+        throw new Error('Ошибка при скачивании файла');
+      }
     } catch (error) {
       console.log('Ошибка при обработке события:', error);
     }
