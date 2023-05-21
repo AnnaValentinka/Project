@@ -83,7 +83,7 @@ export default function TablForm({ posts, photos, user }) {
         body: JSON.stringify({ allEntries }),
       });
 
-      if (response.ok) {
+      if (response.status === 200) {
         const blob = await response.blob();
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement('a');
