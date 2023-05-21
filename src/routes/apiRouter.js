@@ -8,6 +8,7 @@ import isAdmin from '../middlewares/isAdmin';
 import { Education, Photo } from '../../db/models';
 
 const path = require('path');
+const { saveAs } = require('file-saver');
 
 const shortid = require('shortid');
 
@@ -262,22 +263,25 @@ router.post('/download', async (req, res) => {
         }
       });
     });
-
+    // менять можно только что снизу
     const filePath = path.join(__dirname, 'filtered_data.xlsx');
     const stream = createWriteStream(filePath);
 
     await workbook.xlsx.write(stream);
 
     stream.on('finish', () => {
-      res.setHeader(
-        'Content-Type',
-        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-      );
-      res.setHeader('Content-Disposition', 'attachment; filename=filtered_data.xlsx');
-      res.download(filePath, 'filtered_data.xlsx', (err) => {
+      fs.readFile(filePath, (err, data) => {
         if (err) {
-          console.error('Ошибка при скачивании файла:', err);
-          res.status(500).json({ success: false, message: 'Ошибка при скачивании файла' });
+          console.error('Ошибка при чтении файла:', err);
+          res.status(500).json({ success: false, message: 'Ошибка при чтении файла' });
+        } else {
+          res.setHeader(
+            'Content-Type',
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+          );
+          res.setHeader('Content-Disposition', 'attachment; filename=filtered_data.xlsx');
+          res.send(data);
+          saveAs(data, 'filtered_data.xlsx'); // Скачивание файла в браузере с помощью file-saver
         }
 
         // Удалите файл после скачивания, если это требуется
