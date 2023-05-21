@@ -63,56 +63,58 @@ export default function ParsForm({ user }) {
       console.log('Error logging out:', error);
     }
   };
-
-  return (
-    <>
-      <h1 className="text-center text-black-50 fs-1" style={{ fontSize: 20 }}>
-        Welcome
-      </h1>
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'end',
-          alignItems: 'center',
-          marginTop: 20,
-          marginRight: 50,
-        }}
-      >
-        <button
-          type="button"
-          className="btn btn-primary"
-          onClick={() => (window.location = '/table')}
+  if (user.admin === true) {
+    return (
+      <>
+        <h1 className="text-center text-black-50 fs-1" style={{ fontSize: 20 }}>
+          Welcome
+        </h1>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'end',
+            alignItems: 'center',
+            marginTop: 20,
+            marginRight: 50,
+          }}
         >
-          Список
-        </button>{' '}
-        <button
-          type="button"
-          className="btn btn-danger"
-          onClick={handleLogout}
-          style={{ marginLeft: 10 }}
-        >
-          Выход
-        </button>
-      </div>
-      <div style={styles.container}>
-        <h2 style={styles.greeting}>Добро пожаловать, {user.name}!</h2>
-        <div style={styles.inputContainer}>
-          Добавить таблицу
-          <input
-            type="file"
-            onChange={handleFileUpload}
-            style={styles.input}
+          <button
+            type="button"
             className="btn btn-primary"
-          />
-          Изменить таблицу
-          <input
-            type="file"
-            onChange={handleUpdateData}
-            style={styles.input}
+            onClick={() => (window.location = '/table')}
+          >
+            Список
+          </button>{' '}
+          <button
+            type="button"
             className="btn btn-danger"
-          />
+            onClick={handleLogout}
+            style={{ marginLeft: 10 }}
+          >
+            Выход
+          </button>
         </div>
-      </div>
-    </>
-  );
+        <div style={styles.container}>
+          <h2 style={styles.greeting}>Добро пожаловать, {user.name}!</h2>
+          <div style={styles.inputContainer}>
+            Добавить таблицу
+            <input
+              type="file"
+              onChange={handleFileUpload}
+              style={styles.input}
+              className="btn btn-primary"
+            />
+            Изменить таблицу
+            <input
+              type="file"
+              onChange={handleUpdateData}
+              style={styles.input}
+              className="btn btn-danger"
+            />
+          </div>
+        </div>
+      </>
+    );
+  }
+  window.location = '/';
 }
