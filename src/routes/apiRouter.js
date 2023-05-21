@@ -3,11 +3,12 @@
 import express from 'express';
 import { v4 as uuidv4 } from 'uuid';
 import { Op, Sequelize } from 'sequelize';
-import { createWriteStream, fs } from 'fs';
+import { Response } from 'express';
+import fs from 'fs';
+import path from 'path';
 import isAdmin from '../middlewares/isAdmin';
 import { Education, Photo } from '../../db/models';
 
-const path = require('path');
 const { saveAs } = require('file-saver');
 
 const shortid = require('shortid');
@@ -264,14 +265,14 @@ router.post('/download', async (req, res) => {
       });
     });
     // менять можно только что снизу
+    const filePath = path.join(__dirname, 'filtered_data.xlsx');
+    await workbook.xlsx.writeFile(filePath);
+
     res.setHeader(
       'Content-Type',
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     );
     res.setHeader('Content-Disposition', 'attachment; filename=filtered_data.xlsx');
-
-    const filePath = path.join(__dirname, 'filtered_data.xlsx');
-    await workbook.xlsx.writeFile(filePath);
 
     const fileStream = fs.createReadStream(filePath);
     fileStream.pipe(res);
@@ -289,4 +290,5 @@ router.post('/download', async (req, res) => {
     res.status(500).json({ success: false, message: 'Ошибка при скачивании данных' });
   }
 });
+
 export default router;
