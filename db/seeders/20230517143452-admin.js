@@ -2,14 +2,14 @@ const bcrypt = require('bcrypt');
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    const passwordHash = await bcrypt.hash('123', 5);
+    const passwordHash = await bcrypt.hash('project', 5);
 
     // Создание сида для модели Users
     await queryInterface.bulkInsert('Users', [
       {
         name: 'Ольга',
         password: passwordHash,
-        email: 'olga@olga',
+        email: 'media-vuz@ya.ru',
         admin: true,
         createdAt: new Date(),
         updatedAt: new Date(),

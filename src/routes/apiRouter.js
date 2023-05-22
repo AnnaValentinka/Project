@@ -2,7 +2,7 @@
 /* eslint-disable no-restricted-syntax */
 import express from 'express';
 import { v4 as uuidv4 } from 'uuid';
-import { Op, Sequelize } from 'sequelize';
+import { Op, Sequelize, where } from 'sequelize';
 import { Response } from 'express';
 import fs from 'fs';
 import path from 'path';
@@ -288,6 +288,51 @@ router.post('/download', async (req, res) => {
   } catch (error) {
     console.error('Ошибка при скачивании данных:', error);
     res.status(500).json({ success: false, message: 'Ошибка при скачивании данных' });
+  }
+});
+
+router.delete('/delete/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    await Photo.destroy({ where: { education_id: id } }); // Удаляем все связанные фотографии
+    await Education.destroy({ where: { id } }); // Удаляем запись Education
+    res.sendStatus(200);
+  } catch (error) {
+    console.log('Error deleting data:', error);
+    res.status(500).json({ message: 'Error deleting data' });
+  }
+});
+router.get('/edit/:id', async (req, res) => {
+  const { id } = req.params;
+  const onePost = await Education.findOne({ where: { id } });
+  res.json(onePost);
+});
+
+router.put('/edit/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { city, name, address, advertising } = req.body;
+    const education = await Education.findOne({ where: { id } });
+    education.city = city;
+    education.name = name;
+    education.address = address;
+    education.advertising = advertising;
+    await education.save();
+    res.sendStatus(200);
+  } catch (error) {
+    console.log('Error deleting data:', error);
+  }
+});
+router.post('/add', async (req, res) => {
+  console.log(req.body);
+  try {
+    const { city, name, address, advertising } = req.body;
+    const { urlPhoto } = req.body;
+    const education = await Education.create({ city, name, address, advertising, uuID: uuidv4() });
+    const photo = await Photo.create({ education_id: education.id, urlPhoto });
+    res.json({ education, photo });
+  } catch (error) {
+    console.log('Error deleting data:', error);
   }
 });
 
